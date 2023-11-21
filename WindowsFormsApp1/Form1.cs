@@ -47,8 +47,10 @@ namespace WindowsFormsApp1
             OpenCvSharp.CPlusPlus.Size size = new OpenCvSharp.CPlusPlus.Size(work_width, work_height);
             //img = img.GaussianBlur(size,1);
             /*img = img.Dilate(new Mat());*/
-            
-           // img = img.Erode(new Mat());
+
+           // OpenCvSharp
+
+            // img = img.Erode(new Mat());
             img = img.Dilate(new Mat());
             img = img.Canny(img.Width,img.Height);
             //img = img.Dilate(new Mat());
