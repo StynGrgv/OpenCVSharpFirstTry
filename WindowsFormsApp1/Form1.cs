@@ -1,5 +1,4 @@
-﻿using OpenCvSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
-
+using OpenCvSharp.Extensions;
 
 namespace WindowsFormsApp1
 {
@@ -30,9 +29,10 @@ namespace WindowsFormsApp1
         private void button1_Click(object sender, EventArgs e)
         {
             DialogResult result = openFileDialog1.ShowDialog();
-            var img = Cv2.ImRead(openFileDialog1.FileName, LoadMode.GrayScale) ; // 4.JPG pyt.JPG 5.png 30 Stop
-            var img_result = Cv2.ImRead(openFileDialog1.FileName, LoadMode.Color); // 4.JPG pyt.JPG 5.png
-            
+            Mat img = Cv2.ImRead(openFileDialog1.FileName, LoadMode.GrayScale) ; // 4.JPG pyt.JPG 5.png 30 Stop
+            Mat img_result = Cv2.ImRead(openFileDialog1.FileName, LoadMode.Color); // 4.JPG pyt.JPG 5.png
+
+            //Mat CloneMat = new Mat()
             int work_width, work_height;
             if (img.Width % 2 == 0)
             {
@@ -45,19 +45,17 @@ namespace WindowsFormsApp1
             }
             else work_height = img.Height;
             OpenCvSharp.CPlusPlus.Size size = new OpenCvSharp.CPlusPlus.Size(work_width, work_height);
-            //img = img.GaussianBlur(size,1);
-            /*img = img.Dilate(new Mat());*/
 
            // OpenCvSharp
 
             // img = img.Erode(new Mat());
-            img = img.Dilate(new Mat());
-            img = img.Canny(img.Width,img.Height);
-            //img = img.Dilate(new Mat());
+           img = img.Dilate(new Mat());
+         //  img = img.Canny(img.Width,img.Height);
+           // img = img.Dilate(new Mat());
             //img = img.GaussianBlur(size, 3);
             //img = img.Dilate(new Mat());
 
-            CvCircleSegment[] circles = img.HoughCircles(HoughCirclesMethod.Gradient, 1, 0.1);
+            CvCircleSegment[] circles = img.HoughCircles(HoughCirclesMethod.Gradient, 1, 10,100,30,100, 150);
 
 
             var watch = Stopwatch.StartNew();
