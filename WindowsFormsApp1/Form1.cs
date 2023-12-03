@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenCvSharp;
 using OpenCvSharp.CPlusPlus;
-using OpenCvSharp.Extensions;
+using OpenCvSharp;
 
 namespace WindowsFormsApp1
 {
@@ -32,30 +25,14 @@ namespace WindowsFormsApp1
             Mat img = Cv2.ImRead(openFileDialog1.FileName, LoadMode.GrayScale) ; // 4.JPG pyt.JPG 5.png 30 Stop
             Mat img_result = Cv2.ImRead(openFileDialog1.FileName, LoadMode.Color); // 4.JPG pyt.JPG 5.png
 
-            //Mat CloneMat = new Mat()
-            int work_width, work_height;
-            if (img.Width % 2 == 0)
-            {
-                work_width = img.Width - 1;
-            }
-            else work_width = img.Width;
-            if (img.Height % 2 == 0)
-            {
-                work_height = img.Height - 1;
-            }
-            else work_height = img.Height;
-            OpenCvSharp.CPlusPlus.Size size = new OpenCvSharp.CPlusPlus.Size(work_width, work_height);
-
-           // OpenCvSharp
-
-            // img = img.Erode(new Mat());
-           img = img.Dilate(new Mat());
-         //  img = img.Canny(img.Width,img.Height);
-           // img = img.Dilate(new Mat());
-            //img = img.GaussianBlur(size, 3);
-            //img = img.Dilate(new Mat());
-
-            CvCircleSegment[] circles = img.HoughCircles(HoughCirclesMethod.Gradient, 1, 10,100,30,100, 150);
+            // img[np.where((image == [0, 0, 0]).all(axis = 2))] = [0, 0, 255]
+            int a = img_result.Channels();
+           Mat[] ColorMats = img_result.Split();
+            img_result = ColorMats[0];
+            img = ColorMats[0].Threshold(55, 255, ThresholdType.Binary);
+            img_result = Cv2.ImRead(openFileDialog1.FileName, LoadMode.Color);
+            /
+            CvCircleSegment[] circles = img.HoughCircles(HoughCirclesMethod.Gradient, 1, 10,100,30, 50, 100);
 
 
             var watch = Stopwatch.StartNew();
@@ -69,17 +46,20 @@ namespace WindowsFormsApp1
             for (int i = 0; i < circles.Length; i++)
             {
                 float R = circles[i].Radius;
-                Point2f cnt = circles[i].Center;
+                Point2f pnt = circles[i].Center;
 
                 Rect r = new Rect()
                 {
-                    Top = (int)(cnt.Y - R),
-                    Left = (int)(cnt.X - R),
+                    Top = (int)(pnt.Y - R),
+                    Left = (int)(pnt.X - R),
                     Height = (int)(2 * R) + 1,
                     Width = (int)(2 * R) + 1
                 };
 
                 img_result.Rectangle(r.BottomRight, r.TopLeft, Scalar.Red, 1, LineType.AntiAlias);
+                // img_result.Circle(pnt, (int)R, Scalar.Red, 3);
+
+
             }
 
             using (var window = new Window("people detector", WindowMode.None, img_result))
